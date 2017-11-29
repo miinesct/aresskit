@@ -54,13 +54,9 @@ namespace aresskit
         }
 
         public static string GetFirst(string str, int maxLength)
-        {
-            return str.Substring(0, Math.Min(str.Length, maxLength));
-        }
+        { return str.Substring(0, Math.Min(str.Length, maxLength)); }
 
         public static void Log(string logMessage, TextWriter w)
-        {
-            w.Write(logMessage);
-        }
+        { w.Write(logMessage); }
     }
 }
