@@ -9,11 +9,15 @@ namespace aresskit
     {
         public static bool checkInternetConn(string server)
         {
-            using (Ping pingSender = new Ping())
+            try
             {
-                PingReply reply = pingSender.Send(server);
-                return reply.Status == IPStatus.Success ? true : false;
-            }
+                using (Ping pingSender = new Ping())
+                {
+                    PingReply reply = pingSender.Send(server);
+                    return reply.Status == IPStatus.Success ? true : false;
+                }
+            } catch (PingException)
+            { return false; }
         }
 
         public static string GetLocalIPAddress()
